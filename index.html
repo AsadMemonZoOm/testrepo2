@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Listing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            text-align: left;
+        }
+
+        .card img {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin: 10px 0 5px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .card span {
+            font-size: 16px;
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Product Listing</h1>
+    <div class="container" id="product-list"></div>
+
+    <script>
+        async function fetchProducts() {
+            try {
+                const response = await fetch('https://sensible-manually-mallard.ngrok-free.app/products', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'  // This skips the warning page
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const products = await response.json();
+                console.log(products);  // Debugging to check if products are received
+
+                const container = document.getElementById('product-list');
+                container.innerHTML = '';
+
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.innerHTML = `
+                        <img src="${product.image_url}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <span>$${product.price.toFixed(2)}</span>
+                        <button onclick="viewProduct(${product.id})">TryOn</button>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                document.getElementById('product-list').innerHTML = '<p>Failed to load products. Check API URL and CORS settings.</p>';
+            }
+        }
+
+        function viewProduct(productId) {
+            window.location.href = `product.html?id=${productId}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchProducts);
+    </script>
+</body>
+
+</html>
